@@ -1,0 +1,108 @@
+---
+title: "Prueba Markdown"
+author: "Angel Arcones"
+date: "17/1/2022"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+# Intro a RMarkdown
+
+Este script es un ejemplo básico de cómo utilizar `RMarkdown`.  
+La idea es mostrar algunas de las funciones que ofrece para: 
+
+- Formatear texto para documentar, usando Markdown  
+- Organizar código de R en celdas  
+- Mostrar resultados del código de forma limpia y ordenada.
+
+## ¿Para qué usar RMarkdown?
+
+Es muy util sobretodo para **organizar y documentar** scripts, ya que permite tener el código en bloques separados (*celdas*) que se pueden ejecutar independientemente, y permite además incluir texto con múltiples opciones de formateo.
+
+Un ejemplo de cómo se puede visualizar un bloque de código y sus resultados:
+```{r}
+for(i in 1:5){
+  print(paste0("Número ", i))
+}
+```
+
+**La edición de texto permite además**  
+  
+Usar *cursiva*, ~~tachado~~, esto llamado `verbatim`, poner^indices^ y tambien~subindices~  
+
+Editar el \textcolor{red}{texto} \textcolor{blue}{con} \textcolor{green}{colores} 
+
+Escribir formulas: $y = \frac{-b \pm \sqrt{b^{2}-4ac}}{2a}$
+
+
+Utilizar [links a webs](https://www.mncn.csic.es/es)  
+
+
+
+## Ejemplos con código
+
+
+Para comenzar, como se haría en cualquier script, lo primero es cargar las librerías necesarias. En este caso, vamos a usar el conjunto de librerias incluidas en **Tidyverse** para manejo y visualización de datos, y la librería **dslabs** que contiene datasets para usar.
+
+
+En este caso, en las opciones de celda se selecciona para el output `Show nothing (Run Code)`, para que lo ejecute pero no muestre los mensajes de instalación/carga de librerias en documento
+```{r include=FALSE}
+#Instalar si no están
+if(!require(tidyverse)){install.packages("tidyverse")}
+if(!require(dslabs)){install.packages("dslabs")}
+
+#Cargar librerias
+library(tidyverse)
+library(dslabs)
+library(knitr)
+
+```
+
+
+```{r}
+data(movielens)
+head(movielens)
+```
+
+```{r}
+nrow(movielens)
+ncol(movielens)
+colnames(movielens)
+```
+
+
+```{r}
+sort(unique(movielens$year))
+```
+```{r}
+df_tabla <- movielens %>% filter(year>=2008) %>%
+              group_by(year) %>% 
+              summarise("Peliculas por año" = n(), "Nota media"=round(mean(rating),2)) %>% as.data.frame()
+
+df_tabla
+```
+
+```{r results='asis'}
+
+kable(df_tabla, caption = "Peliculas por año y nota media\n(2008-2016)", align="ccc")
+
+```
+```{r}
+regresion <- lm(year~rating, data=movielens)
+resultados <- coef(summary(regresion))
+kable(resultados, caption="Regresión entre año y valoración", align = "cccc", digits = 2)
+```
+Se pueden encontrar mas opciones a utilizar con kable [aquí](https://bookdown.org/yihui/rmarkdown-cookbook/kable.html).
+
+```{r}
+df_plot <- movielens %>% filter(year>=2000) %>%
+              group_by(year) %>% 
+              summarise("Peliculas" = n(),
+                        "Nota_media"=round(mean(rating),2),
+                        "Nota_maxima"=max(rating),
+                        "Nota_minima"=min(rating)) %>% as.data.frame()
+df_plot
+```
+
