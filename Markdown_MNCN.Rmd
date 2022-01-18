@@ -3,9 +3,9 @@ title: "Prueba Markdown"
 author: "Angel Arcones"
 date: "17/1/2022"
 output:
-  pdf_document: default
   html_document:
     df_print: paged
+  pdf_document: default
 ---
 
 # Intro a RMarkdown
@@ -44,7 +44,7 @@ Utilizar [links a webs](https://www.mncn.csic.es/es)
 ## Ejemplos con código
 
 
-Para comenzar, como se haría en cualquier script, lo primero es cargar las librerías necesarias. En este caso, vamos a usar el conjunto de librerias incluidas en **Tidyverse** para manejo y visualización de datos, y la librería **dslabs** que contiene datasets para usar.
+Para comenzar, como se haría en cualquier script, lo primero es cargar las librerías necesarias. En este caso, vamos a usar el conjunto de librerias incluidas en **Tidyverse** para manejo y visualización de datos, la librería **dslabs** que contiene datasets para usar, y la librería **knitr** que permite dar un formato mas limpio a las tablas en Markdown
 
 
 En este caso, en las opciones de celda se selecciona para el output `Show nothing (Run Code)`, para que lo ejecute pero no muestre los mensajes de instalación/carga de librerias en documento
@@ -61,48 +61,94 @@ library(knitr)
 ```
 
 
+### Tablas
+
+
+Empezamos por cargar uno de los datasets disponibles en dslabs, en concreto el llamado *movielens*, que contiene valoraciones de peliculas de cine de las últimas décadas.
+
 ```{r}
 data(movielens)
 head(movielens)
 ```
 
-```{r}
+Se pueden sacar algunos conteos de filas, columnas o nombres de las variables
+
+```{r results='hold'}
 nrow(movielens)
 ncol(movielens)
 colnames(movielens)
 ```
 
 
-```{r}
+También se puede obtener resultados más largos, como los años para los que existen datos.
+En todos estos casos viene incluido por defecto los simbolos de inicio de linea al mostrar resultados, aunque existen alternativas e incluso se podría ocultar usando `comment=NA` en las opciones de la celda.
+```{r comment=NA}
 sort(unique(movielens$year))
 ```
-```{r}
+
+
+Aqui se hace un filtrado y agrupación para obtener una tabla con el número de películas por año desde 2008 y su nota media.
+
+```{r comment=NA}
 df_tabla <- movielens %>% filter(year>=2008) %>%
               group_by(year) %>% 
-              summarise("Peliculas por año" = n(), "Nota media"=round(mean(rating),2)) %>% as.data.frame()
+              summarise("Peliculas por año" = n(), "Nota media"=round(mean(rating),2))
 
 df_tabla
 ```
+
+
+El formato por defecto de la tabla anterior no es especialmente bonito ni útil a la hora de documentar. Por eso existen opciones como la funcion `kable` del paquete **knitr**, que produce unos resultados más limpios y permite un mayor control del aspecto final.
+
 
 ```{r results='asis'}
 
 kable(df_tabla, caption = "Peliculas por año y nota media\n(2008-2016)", align="ccc")
 
 ```
+
+
+Esto se puede emplear también para visualizar tablas de resultados de análisis estadísticos, como en este caso una regresion lineal.
+
 ```{r}
 regresion <- lm(year~rating, data=movielens)
 resultados <- coef(summary(regresion))
 kable(resultados, caption="Regresión entre año y valoración", align = "cccc", digits = 2)
 ```
+
 Se pueden encontrar mas opciones a utilizar con kable [aquí](https://bookdown.org/yihui/rmarkdown-cookbook/kable.html).
+
+
+### Gráficos
+
+Markdown tambien permite tener en el script y el documento de texto los resultados graficos que normalmente estarian en la ventana del visor de R.  
+Este primer ejemplo es utilizando las funciones de ploteo de R base
+
 
 ```{r}
 df_plot <- movielens %>% filter(year>=2000) %>%
               group_by(year) %>% 
               summarise("Peliculas" = n(),
-                        "Nota_media"=round(mean(rating),2),
-                        "Nota_maxima"=max(rating),
-                        "Nota_minima"=min(rating)) %>% as.data.frame()
-df_plot
+                        "Nota_media"=round(mean(rating),2)) %>% as.data.frame()
+
+plot(df_plot$year, df_plot$Nota_media,
+     xlab = 'Año', ylab = 'Nota media',
+     main='Nota media de las peliculas\n(2000 - 2016)',
+     pch=17,
+     col="forestgreen")
 ```
+
+
+Como siempre, ggplot2 ofrece mejores opciones de customización y acabado, y también se puede incluir en el documento
+
+```{r}
+ggplot(df_plot, aes(year, Nota_media, size=Peliculas, colour=Nota_media))+
+  geom_point()+
+  scale_color_distiller(palette='Spectral', direction = 1)+
+  ylab('Nota Media')+
+  xlab('Año')+
+  labs(title = 'Nota media por año', subtitle = '(2000-2016)')+
+  theme_minimal()
+```
+
 
