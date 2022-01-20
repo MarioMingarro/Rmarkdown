@@ -44,8 +44,8 @@ html_document:
 ### Cola
 
 # Tips
-Ctrl + Alt + I insentar un nuevo "code chunk".  
-Doble espacio para lineas diferentes
+`Ctrl + Alt + I` insentar un nuevo "code chunk".  
+`Doble espacio` para lineas diferentes
 `<br>` para insertar linea en blanco
 
 
@@ -58,30 +58,36 @@ Doble espacio para lineas diferentes
 `comment = "<<>>"` Marca los comentarios como queramos (# por defecto)  
 `results = "hide"` Oculta la salida impresa.  
 `fig.show = “hide”` Oculta gráficos.  
+<br>  
+Más info : https://yihui.org/knitr/options/ 
 
 # Se pueden añadir:  
-- Notas
+- Notas  
+`Esta nota^[es un ejemplo]`  
 Esta nota^[es un ejemplo]   
-Nota:`Esta nota^[es un ejemplo]`  
 <br>  
 - Gif  
+`<img src="https://media.giphy.com/media/3ohzdPGmrhcqwsKcFi/giphy.gif" width="250">`
 <img src="https://media.giphy.com/media/3ohzdPGmrhcqwsKcFi/giphy.gif" width="250">  
-Gif: `<img src="https://media.giphy.com/media/3ohzdPGmrhcqwsKcFi/giphy.gif" width="250">`  
 <br>  
 - Videos  
-<iframe width="600" height = "420" src="https://www.youtube.com/embed/4vuhsKExW8s"></iframe>
-Video:`<iframe width="600" height = "420" src="https://www.youtube.com/embed/4vuhsKExW8s"></iframe>` Fijarse en `/embed`  
+`<iframe width="600" height = "420" src="https://www.youtube.com/embed/AhUCVYqXWoE"></iframe>`
+<iframe width="600" height = "420" src="https://www.youtube.com/embed/AhUCVYqXWoE"></iframe>
+
 
 # Tabla interactiva
 ```{r Tabla interactiva}
-DT::datatable(trees, 
+DT::datatable(trees,
               class = "nowrap",
               options = list(autoWidth = TRUE,
-                             columnDefs=list(list(width="50%", targets=0))))
+                             columnDefs = list(list(
+                               width = "50%",
+                               targets = 0))))
 
 ```
-# Opcion ver gráficos durante pruebas  
-Tools->Global options-> RMarkdown -> Show output...
+# Gráficos interactivos
+Opción ver gráficos durante pruebas  
+`Tools->Global options-> RMarkdown -> Show output`...
 
 ```{r}
 data(mtcars)
@@ -89,20 +95,64 @@ plot(mtcars$wt, mtcars$mpg)
 
 ```
 
-```{r Grafico Interactivo, message = FALSE}
+## Plotly  
+https://plotly-r.com/index.html 
+```{r Grafico Interactivo 1, warning = FALSE, message = FALSE}
 library(plotly)
+library(ggplot2)
 data <- mtcars
-fig <- plotly::plot_ly(data, x = mtcars$wt, y = mtcars$mpg, 
-                       text = rownames(data), 
-                       type = "scatter", 
-                       mode = "markers",
-        marker = list(size = ~qsec, opacity = 0.5, color= "green"))
-fig <- fig %>% plotly::layout(title = "Cosas de Coches",
-         xaxis = list(showgrid = FALSE),
-         yaxis = list(showgrid = FALSE))
+figura <- ggplot(mtcars, aes(wt,
+                             mpg,
+                             color = qsec,
+                             size = qsec)) +
+  geom_point()
 
-fig
+ggplotly(figura)
 ```
 
+```{r Grafico Interactivo 2, warning = FALSE, message = FALSE}
+figura_2 <- ggplot(mtcars, aes(as.factor(cyl),
+                               mpg)) +
+  geom_boxplot()
 
+ggplotly(figura_2)
+```
 
+# Mapas  
+## Plotly
+```{r Grafico Interactivo 3, warning = FALSE, message = FALSE}
+world <- rnaturalearth::ne_countries(scale = "medium",
+                                     returnclass = "sf")
+p <-  ggplot(data = world, aes(fill = geounit,
+                               alpha = economy)) +
+  geom_sf() +
+  scale_fill_viridis_d() +
+  theme(legend.position = "none")
+
+ggplotly(p)
+```
+## Leaflet
+
+```{r, warning = FALSE, message = FALSE}
+library(leaflet)
+
+m <- leaflet(world) %>% 
+  setView(lng = -3.689, 
+          lat = 40.440, 
+          zoom = 6) %>% 
+  addMarkers(lng = -3.689, 
+          lat = 40.440) %>% 
+  addPolygons(opacity = 1,
+              color = "white") %>% 
+  addTiles() %>% 
+  addProviderTiles("Esri.WorldImagery")
+
+m 
+```
+
+# La biblia  
+
+<img src="https://bookdown.org/yihui/rmarkdown-cookbook/images/cover.png" width="500px">
+`<img src="https://bookdown.org/yihui/rmarkdown-cookbook/images/cover.png" width="500px">`
+
+https://bookdown.org/yihui/rmarkdown-cookbook/
