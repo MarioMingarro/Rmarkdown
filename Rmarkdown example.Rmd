@@ -1,35 +1,158 @@
 ---
 title: "Rmarkdown example"
 author: "Mario"
-date: "18/1/2022"
-output: html_document
+date: "19/1/2022"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2 
+    number_sections: false
+    toc_float:
+      collapsed: true
+      smooth_scroll: true
+    theme: flatly
+    highlight: espresso
 ---
-Encabezados: # Titulo nivel 1 (H1), ## Titulo nivel 2 (H2), ### Titulo nivel 3 (H3)...
-Cursiva y negrita: *palabra* o _palabra_ para cursiva **palabra** o __palabra__ para negrita.
-Enlaces: [some_text](https://www.mncn.csic.es/es)
-Imagen: ![alt-text](img_location)
-Listas: Comience con un guión o un número y asegúrese de que el primer elemento esté separado de cualquier texto anterior por una línea completa en blanco. Luego separe cada elemento por una línea.
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+# Tabla de contenidos
+
+```
+output:
+  html_document:
+    toc: true             # Crea tabla de contenido
+    toc_depth: 2          # Niveles de la tabla
+    number_sections: true # Enumera las secciones
+    toc_float:            # Tabla de contenido flotante siempre visible
+      collapsed: false    # Aparecen solo con los encabezados de nivel superior
+      smooth_scroll: true # Desplazamientos "animados" en vez de directos
+```
+# Temas y formato
+
+```
+html_document:
+    theme: flatly       # Existen muchos temas (sandstone, cosmo, darkly ...)
+    highlight: espresso # Existen muchos temas (haddock, monochrome, tango ...)
+```
+# Encabezados
+
+`# Titulo nivel 1 (H1)`   
+`## Titulo nivel 2 (H2)`  
+`### Titulo nivel 3 (H3)`
+
+# Hola
+## Cara
+### Cola
+
+# Tips
+`Ctrl + Alt + I` insentar un nuevo "code chunk".  
+`Doble espacio` para lineas diferentes
+`<br>` para insertar linea en blanco
+
+
+# Cabeceras `chuks`
+`echo = FALSE` Oculta el código (Lo ejecuta y produce los resultados).  
+`eval = FALSE` Muestra el código (No lo ejecuta).  
+`include = FALSE` Ejecuta el código (Elimina la salida).  
+`warning = FALSE` Oculta las advertencias de los paquetes y de las funciones.  
+`message = FALSE` Oculta los mensajes de los paquetes y funciones.  
+`comment = "<<>>"` Marca los comentarios como queramos (# por defecto)  
+`results = "hide"` Oculta la salida impresa.  
+`fig.show = “hide”` Oculta gráficos.  
+<br>  
+Más info : https://yihui.org/knitr/options/ 
+
+# Se pueden añadir:  
+- Notas  
+`Esta nota^[es un ejemplo]`  
+Esta nota^[es un ejemplo]   
+<br>  
+- Gif  
+`<img src="https://media.giphy.com/media/3ohzdPGmrhcqwsKcFi/giphy.gif" width="250">`
+<img src="https://media.giphy.com/media/3ohzdPGmrhcqwsKcFi/giphy.gif" width="250">  
+<br>  
+- Videos  
+`<iframe width="600" height = "420" src="https://www.youtube.com/embed/AhUCVYqXWoE"></iframe>`
+<iframe width="600" height = "420" src="https://www.youtube.com/embed/AhUCVYqXWoE"></iframe>
+
+
+# Tabla interactiva
+```{r Tabla interactiva}
+DT::datatable(trees,
+              class = "nowrap",
+              options = list(autoWidth = TRUE,
+                             columnDefs = list(list(
+                               width = "50%",
+                               targets = 0))))
+
+```
+# Gráficos interactivos
+Opción ver gráficos durante pruebas  
+`Tools->Global options-> RMarkdown -> Show output`...
+
+```{r}
+data(mtcars)
+plot(mtcars$wt, mtcars$mpg)
+
 ```
 
-## R Markdown
+## Plotly  
+https://plotly-r.com/index.html 
+```{r Grafico Interactivo 1, warning = FALSE, message = FALSE}
+library(plotly)
+library(ggplot2)
+data <- mtcars
+figura <- ggplot(mtcars, aes(wt,
+                             mpg,
+                             color = qsec,
+                             size = qsec)) +
+  geom_point()
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+ggplotly(figura)
 ```
 
-## Including Plots
+```{r Grafico Interactivo 2, warning = FALSE, message = FALSE}
+figura_2 <- ggplot(mtcars, aes(as.factor(cyl),
+                               mpg)) +
+  geom_boxplot()
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+ggplotly(figura_2)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+# Mapas  
+## Plotly
+```{r Grafico Interactivo 3, warning = FALSE, message = FALSE}
+world <- rnaturalearth::ne_countries(scale = "medium",
+                                     returnclass = "sf")
+p <-  ggplot(data = world, aes(fill = geounit,
+                               alpha = economy)) +
+  geom_sf() +
+  scale_fill_viridis_d() +
+  theme(legend.position = "none")
+
+ggplotly(p)
+```
+## Leaflet
+
+```{r, warning = FALSE, message = FALSE}
+library(leaflet)
+
+m <- leaflet(world) %>% 
+  setView(lng = -3.689, 
+          lat = 40.440, 
+          zoom = 6) %>% 
+  addMarkers(lng = -3.689, 
+          lat = 40.440) %>% 
+  addPolygons(opacity = 1,
+              color = "white") %>% 
+  addTiles() %>% 
+  addProviderTiles("Esri.WorldImagery")
+
+m 
+```
+
+# La biblia  
+
+<img src="https://bookdown.org/yihui/rmarkdown-cookbook/images/cover.png" width="500px">
+`<img src="https://bookdown.org/yihui/rmarkdown-cookbook/images/cover.png" width="500px">`
+
+https://bookdown.org/yihui/rmarkdown-cookbook/
