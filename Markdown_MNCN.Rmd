@@ -3,9 +3,10 @@ title: "Prueba Markdown"
 author: "Angel Arcones"
 date: "17/1/2022"
 output:
+  word_document: default
+  pdf_document: default
   html_document:
     df_print: paged
-  pdf_document: default
 ---
 
 # Intro a RMarkdown
@@ -17,12 +18,18 @@ La idea es mostrar algunas de las funciones que ofrece para:
 - Organizar código de R en celdas  
 - Mostrar resultados del código de forma limpia y ordenada.
 
+Para poder exportar en formato PDF, es necesario instalar lo siguiente (un renderizador de LaTeX)
+```{r eval=FALSE, include=FALSE}
+tinytex::install_tinytex()
+```
+
+
 ## ¿Para qué usar RMarkdown?
 
 Es muy util sobretodo para **organizar y documentar** scripts, ya que permite tener el código en bloques separados (*celdas*) que se pueden ejecutar independientemente, y permite además incluir texto con múltiples opciones de formateo.
 
 Un ejemplo de cómo se puede visualizar un bloque de código y sus resultados:
-```{r}
+```{r for loop}
 for(i in 1:5){
   print(paste0("Número ", i))
 }
@@ -69,6 +76,7 @@ Empezamos por cargar uno de los datasets disponibles en dslabs, en concreto el l
 ```{r}
 data(movielens)
 head(movielens)
+
 ```
 
 Se pueden sacar algunos conteos de filas, columnas o nombres de las variables
@@ -139,9 +147,11 @@ plot(df_plot$year, df_plot$Nota_media,
 ```
 
 
-Como siempre, ggplot2 ofrece mejores opciones de customización y acabado, y también se puede incluir en el documento
+Como siempre, ggplot2 ofrece mejores opciones de customización y acabado, y también se puede incluir en el documento  
 
-```{r}
+**NOTA** pinchando en las opciones de la celda, se pueden seleccionar caracteristicas como el tamaño de la figura (y se añaden al encabezado de la celda)
+
+```{r fig.height=6, fig.width=8}
 ggplot(df_plot, aes(year, Nota_media, size=Peliculas, colour=Nota_media))+
   geom_point()+
   scale_color_distiller(palette='Spectral', direction = 1)+
