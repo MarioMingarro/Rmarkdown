@@ -1,7 +1,7 @@
 # Rmarkdown
 
-Ejemplos introductorios de Rmarkdown
-<h1 align="center"><img src="https://media.giphy.com/media/l1J9wMccAykUCLIic/giphy.gif" width="300"></h1>
+Ejemplos introductorios de Rmarkdown propuestos por @AngelArcones & @MarioMingarro
+<align="center"><img src="https://media.giphy.com/media/l1J9wMccAykUCLIic/giphy.gif"  width="480" height="477">
 
 # Pero si realmente quieres aprender:
 
